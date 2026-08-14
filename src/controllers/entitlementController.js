@@ -53,6 +53,7 @@ const reserve = async (req, res, next) => {
       id: parse(uuid, req.params.id),
       context: contextForRequest(req),
       idempotencyKey: idempotency(req),
+      event: payload.event,
     });
     return sendMutation(res, result);
   } catch (error) { return next(error); }
@@ -66,6 +67,7 @@ const release = async (req, res, next) => {
       id: parse(uuid, req.params.id),
       context: contextForRequest(req),
       idempotencyKey: idempotency(req),
+      event: payload.event,
     });
     return sendMutation(res, result);
   } catch (error) { return next(error); }
@@ -79,6 +81,7 @@ const consume = async (req, res, next) => {
       id: parse(uuid, req.params.id),
       context: contextForRequest(req),
       idempotencyKey: idempotency(req),
+      event: payload.event,
     });
     return sendMutation(res, result);
   } catch (error) { return next(error); }
@@ -92,6 +95,7 @@ const refund = async (req, res, next) => {
       id: parse(uuid, req.params.id),
       context: contextForRequest(req),
       idempotencyKey: idempotency(req),
+      event: payload.event,
     });
     return sendMutation(res, result);
   } catch (error) { return next(error); }
@@ -105,6 +109,7 @@ const voidEntitlement = async (req, res, next) => {
       id: parse(uuid, req.params.id),
       context: contextForRequest(req),
       idempotencyKey: idempotency(req),
+      event: payload.event,
     });
     return sendMutation(res, result);
   } catch (error) { return next(error); }

@@ -87,6 +87,10 @@ const serializeMovement = (movement) => {
     consumedDelta: Number(json.consumedDelta),
     voidedDelta: Number(json.voidedDelta || 0),
     idempotencyKey: json.idempotencyKey,
+    eventId: json.eventId || null,
+    correlationId: json.correlationId || null,
+    sourceSystem: json.sourceSystem || null,
+    sourceId: json.sourceId || null,
     reason: json.reason || null,
     performedByUserId: json.performedByUserId || null,
     occurredAt: json.occurredAt,
@@ -141,9 +145,13 @@ const resolveIdempotentResult = async (idempotencyKey, entitlementId, transactio
   return { entitlement, movement, idempotent: true };
 };
 
-const createMovement = async ({ entitlement, transaction, ...payload }) => EntitlementMovement.create({
+const createMovement = async ({ entitlement, transaction, event, ...payload }) => EntitlementMovement.create({
   entitlementId: entitlement.id,
   ...payload,
+  eventId: event?.eventId || null,
+  correlationId: event?.correlationId || null,
+  sourceSystem: event?.sourceSystem || null,
+  sourceId: event?.sourceId || null,
   occurredAt: payload.occurredAt || new Date(),
 }, { transaction });
 
@@ -196,6 +204,7 @@ const issueEntitlement = async (payload, context) => {
       idempotencyKey: `issue:${payload.sourceSystem}:${payload.sourceId}`,
       reason: payload.reason || 'Entitlement emitido pela origem autorizada.',
       performedByUserId: context?.userId || null,
+      event: payload.event,
     });
     return { entitlement, idempotent: false };
   });
@@ -255,7 +264,7 @@ const mutateEntitlement = async ({ id, context, idempotencyKey, operation }) => 
   });
 };
 
-const reserveEntitlement = ({ id, context, idempotencyKey, appointmentId, reason }) => mutateEntitlement({
+const reserveEntitlement = ({ id, context, idempotencyKey, appointmentId, event, reason }) => mutateEntitlement({
   id,
   context,
   idempotencyKey,
@@ -283,12 +292,13 @@ const reserveEntitlement = ({ id, context, idempotencyKey, appointmentId, reason
       idempotencyKey,
       reason: reason || 'Crédito reservado para agendamento.',
       performedByUserId: context?.userId || null,
+      event,
     });
     return { entitlement, movement, idempotent: false };
   },
 });
 
-const releaseEntitlement = ({ id, context, idempotencyKey, appointmentId, reason }) => mutateEntitlement({
+const releaseEntitlement = ({ id, context, idempotencyKey, appointmentId, event, reason }) => mutateEntitlement({
   id,
   context,
   idempotencyKey,
@@ -315,12 +325,13 @@ const releaseEntitlement = ({ id, context, idempotencyKey, appointmentId, reason
       idempotencyKey,
       reason: reason || 'Reserva de crédito liberada.',
       performedByUserId: context?.userId || null,
+      event,
     });
     return { entitlement, movement, idempotent: false };
   },
 });
 
-const consumeEntitlement = ({ id, context, idempotencyKey, appointmentId, type, reason }) => mutateEntitlement({
+const consumeEntitlement = ({ id, context, idempotencyKey, appointmentId, event, type, reason }) => mutateEntitlement({
   id,
   context,
   idempotencyKey,
@@ -348,12 +359,13 @@ const consumeEntitlement = ({ id, context, idempotencyKey, appointmentId, type, 
       idempotencyKey,
       reason: reason || 'Crédito consumido pela conclusão do fluxo de sessão.',
       performedByUserId: context?.userId || null,
+      event,
     });
     return { entitlement, movement, idempotent: false };
   },
 });
 
-const refundEntitlement = ({ id, context, idempotencyKey, appointmentId, reason }) => mutateEntitlement({
+const refundEntitlement = ({ id, context, idempotencyKey, appointmentId, event, reason }) => mutateEntitlement({
   id,
   context,
   idempotencyKey,
@@ -379,12 +391,13 @@ const refundEntitlement = ({ id, context, idempotencyKey, appointmentId, reason 
       idempotencyKey,
       reason: reason || 'Reembolso administrativo de crédito.',
       performedByUserId: context?.userId || null,
+      event,
     });
     return { entitlement, movement, idempotent: false };
   },
 });
 
-const voidEntitlement = ({ id, context, idempotencyKey, reason }) => mutateEntitlement({
+const voidEntitlement = ({ id, context, idempotencyKey, event, reason }) => mutateEntitlement({
   id,
   context,
   idempotencyKey,
@@ -409,6 +422,7 @@ const voidEntitlement = ({ id, context, idempotencyKey, reason }) => mutateEntit
       idempotencyKey,
       reason: reason || 'Entitlement anulado administrativamente.',
       performedByUserId: context?.userId || null,
+      event,
     });
     return { entitlement, movement, idempotent: false };
   },

@@ -6,6 +6,12 @@ const sourceId = z.string().trim().min(1).max(160);
 const sourceSystem = z.string().trim().min(1).max(80);
 const idempotencyKey = z.string().trim().min(1).max(220);
 const date = z.coerce.date();
+const integrationEvent = z.object({
+  eventId: idempotencyKey,
+  correlationId: idempotencyKey.optional(),
+  sourceSystem,
+  sourceId: sourceId.optional(),
+}).strict();
 
 const issueSchema = z.object({
   tenantId: uuid,
@@ -17,6 +23,7 @@ const issueSchema = z.object({
   totalCredits: z.coerce.number().int().min(1).max(100000),
   expiresAt: date.nullable().optional(),
   metadata: z.record(z.any()).optional(),
+  event: integrationEvent.optional(),
   reason: z.string().trim().max(500).optional(),
 }).strict();
 
@@ -24,6 +31,7 @@ const mutationSchema = z.object({
   tenantId: uuid.optional(),
   organizationId: nullableUuid,
   appointmentId: nullableUuid,
+  event: integrationEvent.optional(),
   reason: z.string().trim().max(500).optional(),
 }).strict();
 

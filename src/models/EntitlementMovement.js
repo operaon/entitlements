@@ -15,6 +15,22 @@ const EntitlementMovement = sequelize.define('EntitlementMovement', {
     type: DataTypes.UUID,
     allowNull: true,
   },
+  eventId: {
+    type: DataTypes.STRING(220),
+    allowNull: true,
+  },
+  correlationId: {
+    type: DataTypes.STRING(220),
+    allowNull: true,
+  },
+  sourceSystem: {
+    type: DataTypes.STRING(80),
+    allowNull: true,
+  },
+  sourceId: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+  },
   type: {
     type: DataTypes.ENUM(
       'ISSUE',
@@ -76,6 +92,8 @@ const EntitlementMovement = sequelize.define('EntitlementMovement', {
     { fields: ['appointmentId'] },
     { fields: ['type'] },
     { fields: ['idempotencyKey'], unique: true },
+    { fields: ['eventId'], unique: true },
+    { fields: ['correlationId'] },
   ],
 });
 
