@@ -111,3 +111,8 @@ O cutover recomendado é criar o ledger próprio, executar dry-run e reconcilia�
 A suíte atual utiliza banco PostgreSQL de teste e valida emissão idempotente, reserva/liberação/consumo, isolamento de tenant, anulação sem confusão com consumo e RBAC dinâmico. Antes de publicar alterações, execute `npm run lint:syntax`, `npm test` e `npm run migrate` no banco correto.
 
 O serviço registra `X-Request-Id` em todas as respostas, usa logs estruturados com Pino, aplica Helmet, compressão, CORS configurável e rate limit operacional. O readiness verifica a conexão efetiva ao banco próprio.
+
+<!-- OPERAON-DOCUMENTATION-LINK -->
+## Documentação
+
+A documentação técnica padronizada está em [docs/INDEX.md](docs/INDEX.md). Ela inclui arquitetura, responsabilidades, segurança, contratos, operação, testes, runbooks e decisões.
