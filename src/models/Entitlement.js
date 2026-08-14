@@ -31,6 +31,11 @@ const Entitlement = sequelize.define('Entitlement', {
     type: DataTypes.UUID,
     allowNull: true,
   },
+  creditUnit: {
+    type: DataTypes.ENUM('SESSION'),
+    allowNull: false,
+    defaultValue: 'SESSION',
+  },
   totalCredits: {
     type: DataTypes.INTEGER,
     allowNull: false,

@@ -54,12 +54,20 @@ test('emite de forma idempotente e grava somente um movimento ISSUE', async () =
   const first = await issue();
   expect(first.status).toBe(201);
   expect(first.body.data.entitlement.availableCredits).toBe(5);
+  expect(first.body.data.entitlement.creditUnit).toBe('SESSION');
   expect(first.body.data.idempotent).toBe(false);
 
   const replay = await issue();
   expect(replay.status).toBe(200);
   expect(replay.body.data.idempotent).toBe(true);
   expect(await EntitlementMovement.count()).toBe(1);
+});
+
+test('rejeita unidades temporais sem alterar o saldo do tenant', async () => {
+  const response = await issue({ sourceId: 'order-unsupported-unit', creditUnit: 'MINUTE' });
+  expect(response.status).toBe(422);
+  expect(response.body.error.code).toBe('VALIDATION_ERROR');
+  expect(await Entitlement.count()).toBe(0);
 });
 
 test('reserva, libera e consome uma unidade mantendo a invariância do saldo', async () => {

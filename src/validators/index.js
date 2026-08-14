@@ -4,6 +4,7 @@ const uuid = z.string().uuid();
 const nullableUuid = uuid.nullable().optional();
 const sourceId = z.string().trim().min(1).max(160);
 const sourceSystem = z.string().trim().min(1).max(80);
+const creditUnit = z.literal('SESSION');
 const idempotencyKey = z.string().trim().min(1).max(220);
 const date = z.coerce.date();
 const integrationEvent = z.object({
@@ -21,6 +22,7 @@ const issueSchema = z.object({
   sourceSystem,
   sourceId,
   totalCredits: z.coerce.number().int().min(1).max(100000),
+  creditUnit: creditUnit.default('SESSION'),
   expiresAt: date.nullable().optional(),
   metadata: z.record(z.any()).optional(),
   event: integrationEvent.optional(),
@@ -59,6 +61,7 @@ const policySchema = z.object({
 module.exports = {
   uuid,
   idempotencyKey,
+  creditUnit,
   issueSchema,
   mutationSchema,
   consumeSchema,

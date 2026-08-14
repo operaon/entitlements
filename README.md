@@ -51,7 +51,7 @@ A autorização aceita apenas permissões presentes nos claims — ou `*:*` — 
 
 ## Modelo de saldo e ledger
 
-Cada entitlement representa uma concessão independente de créditos para um paciente dentro de um tenant e, opcionalmente, organização. O saldo é materializado para consultas rápidas e cada alteração é acompanhada por uma linha imutável em `entitlement_movements`.
+Cada entitlement representa uma concessão independente de créditos para um paciente dentro de um tenant e, opcionalmente, organização. A unidade suportada nesta versão é `SESSION`: cada crédito corresponde a uma sessão/appointment, e não a minutos ou horas. O saldo é materializado para consultas rápidas e cada alteração é acompanhada por uma linha imutável em `entitlement_movements`.
 
 > **Invariante:** `totalCredits = availableCredits + reservedCredits + consumedCredits + voidedCredits`.
 
@@ -59,7 +59,7 @@ A reserva move uma unidade de disponível para reservado; a liberação faz o mo
 
 | Entidade | Finalidade |
 | --- | --- |
-| `entitlements` | Concessão, saldo materializado, estado e origem idempotente |
+| `entitlements` | Concessão, unidade `SESSION`, saldo materializado, estado e origem idempotente |
 | `entitlement_movements` | Ledger auditável e imutável de deltas |
 | `tenant_entitlement_policies` | Política efetiva de cancelamento por tenant e organização |
 
@@ -83,7 +83,7 @@ Os endpoints de mutação usam JSON e exigem `Idempotency-Key`, exceto a emissã
 | `GET /api/entitlements/policy` | `entitlements:read` | Consulta a política efetiva |
 | `PUT /api/entitlements/policy` | `entitlements:admin` | Cria ou atualiza a política do escopo |
 
-O payload de emissão contém `tenantId`, `organizationId` opcional, `patientId`, `productId` opcional, `sourceSystem`, `sourceId`, `totalCredits`, `expiresAt` opcional e `metadata`. As mutações podem receber `appointmentId` e `reason`. O consumo exige `type` com um dos valores `COMPLETE_CONSUME`, `LATE_CANCEL_CONSUME` ou `NO_SHOW_CONSUME`.
+O payload de emissão contém `tenantId`, `organizationId` opcional, `patientId`, `productId` opcional, `sourceSystem`, `sourceId`, `totalCredits`, `creditUnit` opcional com default `SESSION`, `expiresAt` opcional e `metadata`. Unidades `HOUR` e `MINUTE` são rejeitadas até que exista implementação explícita de fracionamento, arredondamento, reserva e consumo. As mutações podem receber `appointmentId` e `reason`. O consumo exige `type` com um dos valores `COMPLETE_CONSUME`, `LATE_CANCEL_CONSUME` ou `NO_SHOW_CONSUME`.
 
 As respostas de mutação retornam `success`, o entitlement serializado, o movimento criado quando aplicável e o indicador `idempotent`. Erros de autenticação, autorização, escopo, saldo, conflito de idempotência e validação são retornados pelo handler operacional com código estável e `requestId`.
 

@@ -12,6 +12,8 @@ const {
   ValidationError,
 } = require('../utils/errors');
 
+const CREDIT_UNIT = 'SESSION';
+
 const DEFAULT_POLICY = Object.freeze({
   cancellationWindowHours: 24,
   lateCancellationConsumesCredit: true,
@@ -107,6 +109,7 @@ const serializeEntitlement = (entitlement, { includeMovements = false } = {}) =>
     organizationId: json.organizationId || null,
     patientId: json.patientId,
     productId: json.productId || null,
+    creditUnit: json.creditUnit || CREDIT_UNIT,
     status: json.status,
     totalCredits: Number(json.totalCredits),
     availableCredits: Number(json.availableCredits),
@@ -158,6 +161,10 @@ const createMovement = async ({ entitlement, transaction, event, ...payload }) =
 const issueEntitlement = async (payload, context) => {
   const scope = requireScope(context, payload);
   const totalCredits = asInteger(payload.totalCredits, 'totalCredits');
+  const creditUnit = payload.creditUnit || CREDIT_UNIT;
+  if (creditUnit !== CREDIT_UNIT) {
+    throw new ValidationError(`Unidade de crédito não suportada: ${creditUnit}.`, 'CREDIT_UNIT_UNSUPPORTED');
+  }
   if (totalCredits <= 0) throw new ValidationError('totalCredits deve ser maior que zero.', 'INVALID_CREDIT_AMOUNT');
   if (!payload.sourceSystem || !payload.sourceId || !payload.patientId) {
     throw new ValidationError('sourceSystem, sourceId e patientId são obrigatórios.', 'ISSUE_FIELDS_REQUIRED');
@@ -171,7 +178,8 @@ const issueEntitlement = async (payload, context) => {
     });
     if (existing) {
       if (existing.tenantId !== scope.tenantId || existing.patientId !== payload.patientId
-        || Number(existing.totalCredits) !== totalCredits) {
+        || Number(existing.totalCredits) !== totalCredits
+        || (existing.creditUnit || CREDIT_UNIT) !== creditUnit) {
         throw new ConflictError('A origem já está associada a um entitlement incompatível.', 'ISSUE_SOURCE_CONFLICT');
       }
       return { entitlement: existing, idempotent: true };
@@ -184,6 +192,7 @@ const issueEntitlement = async (payload, context) => {
       organizationId: scope.organizationId,
       patientId: payload.patientId,
       productId: payload.productId || null,
+      creditUnit,
       totalCredits,
       availableCredits: totalCredits,
       reservedCredits: 0,
@@ -498,6 +507,7 @@ const upsertPolicy = async (payload, context) => {
 };
 
 module.exports = {
+  CREDIT_UNIT,
   DEFAULT_POLICY,
   requireScope,
   issueEntitlement,
