@@ -38,7 +38,7 @@ module.exports = {
     secret: jwtSecret,
     publicKey: normalizeKey(process.env.JWT_PUBLIC_KEY),
     issuer: process.env.JWT_ISSUER || 'operaon-identity',
-    audience: parseList(process.env.JWT_AUDIENCE, ['operaon-api', 'operaon-identity', 'operaon-entitlements']),
+    audience: parseList(process.env.JWT_AUDIENCE, ['operaon-entitlements']),
   },
   database: {
     url: process.env.DATABASE_URL,
