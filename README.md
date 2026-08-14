@@ -1,4 +1,15 @@
-# Operaon Entitlements & Session Credits
+# Entitlements / Session Credits
+
+> Entitlements da Operaon, fonte de verdade do ledger de créditos, reservas, consumo e reembolsos.
+
+| Item | Referência |
+|---|---|
+| Documentação | [docs/INDEX.md](docs/INDEX.md) |
+| Segurança | [SECURITY.md](SECURITY.md) |
+| Contribuição | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Processo de release | [docs/release-process.md](docs/release-process.md) |
+
+---
 
 Standalone responsável pela **titularidade de sessões**, emissão de créditos, reserva para agendamentos, liberação, consumo, reembolso, anulação administrativa, extrato auditável e políticas de cancelamento. O serviço possui banco próprio e não mantém foreign keys físicas para o banco do gateway, Agenda, Catálogo, Pacientes ou qualquer outro módulo.
 

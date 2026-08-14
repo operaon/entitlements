@@ -1,0 +1,21 @@
+repository: entitlements
+description: "Entitlements da Operaon, fonte de verdade do ledger de créditos, reservas, consumo e reembolsos."
+homepage: "https://github.com/operaon/entitlements"
+topics:
+  - operaon
+  - entitlements
+  - credits
+  - ledger
+  - sessions
+  - idempotency
+  - nodejs
+custom_properties:
+  domain_owner: entitlements
+  repository_type: module
+  lifecycle: active
+  documentation: docs/INDEX.md
+  security_tier: standard
+  default_branch: main
+notes:
+  - "Homepage uses the repository URL until an official public product URL is defined."
+  - "Stars, watchers, forks and audit history are GitHub-managed metrics and are not programmable repository content."
