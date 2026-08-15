@@ -41,3 +41,9 @@ O endpoint de concessão exige `featureKey`, `sourceSystem` e `sourceId`. Grants
 O endpoint de consulta é somente leitura e não concede acesso por si só. Cada módulo owner deve repetir a autorização no ponto de execução da operação, utilizando a resposta do Entitlements e mantendo o tenant do JWT como escopo obrigatório.
 
 Consumo e liberação são operações transacionais. O mesmo `Idempotency-Key` dentro do tenant retorna o resultado anterior e não cria um segundo movimento. A origem comercial deve ser registrada no grant, enquanto eventos e correlação devem acompanhar os movimentos quando fornecidos.
+
+## Integração de quotas com serviços internos
+
+As mutações de quota aceitam opcionalmente `sourceSystem` e `sourceId`, além de `idempotencyKey`. Esses campos identificam o owner da reserva e permitem auditoria sem mover tabelas de domínio para o Entitlements. A combinação de `tenantId`, `idempotencyKey` e os movimentos append-only impede que uma repetição de request consuma a mesma quota duas vezes.
+
+O módulo Tenant utiliza a feature key `quota:professionals`. No rollout inicial, o comportamento é controlado por `ENTITLEMENTS_PROFESSIONAL_QUOTA_MODE`: `legacy` preserva o campo histórico `maxProfessionals`, `shadow` compara a quota sem bloquear e `enforced` torna o grant do Entitlements a fonte de verdade para novas reservas e ativações.

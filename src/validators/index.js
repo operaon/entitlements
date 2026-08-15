@@ -87,6 +87,8 @@ const quotaMutationSchema = z.object({
   organizationId: uuid.optional(),
   featureKey,
   quantity: z.coerce.number().int().min(1).max(1000000000),
+  sourceSystem: sourceSystem.optional(),
+  sourceId: sourceId.optional(),
   event: integrationEvent.optional(),
   occurredAt: date.optional(),
   reason: z.string().trim().max(500).optional(),
