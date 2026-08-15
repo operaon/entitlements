@@ -21,3 +21,13 @@ O módulo não deve ser exposto diretamente à Internet. O tenant deve ser valid
 ## Referências
 
 [1]: https://github.com/operaon "Organização Operaon"
+
+## Capacidades comerciais por tenant
+
+O Entitlements mantém dois subdomínios separados. O ledger de `SESSION` continua responsável por créditos de sessão de pacientes, reservas, consumo, reembolso e anulação. O subdomínio comercial é responsável por concessões declarativas de funcionalidades e quotas técnicas do tenant.
+
+As feature keys seguem o formato minúsculo com separadores, por exemplo `module:clinical`, `module:branding`, `capability:payments.online` e `quota:professionals`. Grants booleanos habilitam funcionalidades; grants do tipo `QUOTA` concedem uma quantidade e unidade, como `PROFESSIONAL`, `UNIT`, `GB` ou `MESSAGE`.
+
+Cada grant possui tenant, organização opcional, origem idempotente, estado, janela de vigência e metadata. O consumo de quotas é registrado em `feature_grant_movements`; operações de consumo e liberação exigem `Idempotency-Key` e nunca devem ser inferidas somente pelo frontend.
+
+O campo legado `Tenant.maxProfessionals` permanece compatível durante a migração, mas a fonte de verdade planejada para novos fluxos é `quota:professionals`. Nenhum módulo deve criar sua própria tabela de planos ou replicar grants do Entitlements.
